@@ -1,14 +1,11 @@
 package org.example;
 
-import org.example.dao.PersonDAO;
 import org.example.dao.PersonDAOImpl;
+import org.example.gui.PassWordDialog;
 import org.example.utils.AppPreferences;
 import org.example.utils.PropertyReader;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.ImportResource;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.core.support.LdapContextSource;
 
@@ -25,8 +22,10 @@ public class AppConfig {
             PropertyReader propertyReader=propertyReader();
             contextSource.setUrl(propertyReader.getUrl());
             contextSource.setBase(propertyReader.getBase());
-            contextSource.setUserDn(propertyReader.getUserdN());
-            contextSource.setPassword(new String(propertyReader.getPassword()));
+            PassWordDialog passWordDialog=passWordDialog();
+            String login= String.format("%s\\%s", propertyReader.getDomain(), passWordDialog.getLogin());
+            contextSource.setUserDn(login);
+            contextSource.setPassword(new String(passWordDialog.getPassword()));
             return contextSource;
         }
         @Bean
@@ -56,32 +55,21 @@ public class AppConfig {
 //получаем значения свойств из объекта Properties
             propertyReader.setUrl(properties.getProperty("url"));
             propertyReader.setBase(properties.getProperty("base"));
-            propertyReader.setUserdN(properties.getProperty("domain")+"\\"+userDn());
-            propertyReader.setPassword(properties.getProperty("password").toCharArray());
+            propertyReader.setDomain(properties.getProperty("domain"));
             return propertyReader;
         }
 
         @Bean
     public String userDn(){
-            Principal principal = new Principal() {
-                @Override
-                public String getName() {
-                    return System.getProperty("user.name");
-                }
-            };
+            Principal principal = () -> System.getProperty("user.name");
             return principal.getName();
         }
 
-        @Bean
-    public AppPreferences appPreferences(){
-        return new AppPreferences();
-        }
-
-        private char[] password(){
-        AppPreferences appPreferences = new AppPreferences();
-        if ("".equals(appPreferences.getWord())){
-
-        }
-        }
+    private PassWordDialog passWordDialog() {
+        AppPreferences appPreferences=new AppPreferences();
+        PassWordDialog pwdDialog = new PassWordDialog(null, true, userDn(), appPreferences.getWord());
+        pwdDialog.setVisible(true);
+        return pwdDialog;
+    }
 }
 

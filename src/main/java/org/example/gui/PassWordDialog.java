@@ -1,43 +1,34 @@
 package org.example.gui;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.Resource;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 public class PassWordDialog extends JDialog {
 
-    private final JLabel jlblUsername = new JLabel("Username");
-    private final JLabel jlblPassword = new JLabel("Password");
     private final JTextField jtfUsername = new JTextField(15);
     private final JPasswordField jpfPassword = new JPasswordField();
 
     private final JButton jbtOk = new JButton("Login");
 
-    private final JLabel jlblStatus = new JLabel(" ");
-
-    @Resource(name = "userDn")
-    private String name;
     public PassWordDialog() {
-        this(null, true, "");
+        this(null, true, "", "");
     }
 
-    public PassWordDialog(final JFrame parent, boolean modal, String username) {
+    public PassWordDialog(final JFrame parent, boolean modal, String username, String password) {
         super(parent, modal);
         JPanel p3 = new JPanel(new GridLayout(2, 1));
+        JLabel jlblUsername = new JLabel("Username");
         p3.add(jlblUsername);
+        JLabel jlblPassword = new JLabel("Password");
         p3.add(jlblPassword);
         JPanel p4 = new JPanel(new GridLayout(2, 1));
         jtfUsername.setText(username);
+        jpfPassword.setText(password);
         addWindowListener( new WindowAdapter() {
             public void windowOpened( WindowEvent e ){
-                jpfPassword.requestFocus();
+                jbtOk.requestFocus();
             }
         });
         p4.add(jtfUsername);
@@ -52,9 +43,9 @@ public class PassWordDialog extends JDialog {
 
         JPanel p5 = new JPanel(new BorderLayout());
         p5.add(p2, BorderLayout.CENTER);
-        p5.add(jlblStatus, BorderLayout.NORTH);
-        jlblStatus.setForeground(Color.RED);
-        jlblStatus.setHorizontalAlignment(SwingConstants.CENTER);
+        JCheckBox cbStored = new JCheckBox("Запомнить пароль");
+        p5.add(cbStored, BorderLayout.NORTH);
+        cbStored.setHorizontalAlignment(SwingConstants.CENTER);
 
         setLayout(new BorderLayout());
         add(p1, BorderLayout.CENTER);
@@ -71,23 +62,23 @@ public class PassWordDialog extends JDialog {
         });
 
 
-        jbtOk.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if ("stackoverflow".equals(String.valueOf(jpfPassword.getPassword()))
-                        && "stackoverflow".equals(jtfUsername.getText())) {
-                    parent.setVisible(true);
-                    setVisible(false);
-                } else {
-                    jlblStatus.setText("Invalid username or password");
-                }
-            }
+        jbtOk.addActionListener(e -> {
+            setVisible(false);
+            /*if ("stackoverflow".equals(String.valueOf(jpfPassword.getPassword()))
+                    && "stackoverflow".equals(jtfUsername.getText())) {
+                parent.setVisible(true);
+                setVisible(false);
+            } else {
+                jlblStatus.setText("Invalid username or password");
+            }*/
         });
     }
-
-    public static void main(String[] args) {
-        JFrame frame=new JFrame("input");
-        PassWordDialog passWordDialog=new PassWordDialog(frame, true, "login");
-        passWordDialog.setVisible(true);
+    public String getLogin(){
+        return jtfUsername.getText();
+    }
+    public char[] getPassword() {
+        char[] pwd = jpfPassword.getPassword().clone();
+        jpfPassword.setText("");
+        return pwd;
     }
 }
