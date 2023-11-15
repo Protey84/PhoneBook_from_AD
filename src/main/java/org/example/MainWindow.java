@@ -14,13 +14,15 @@ import java.util.*;
 import java.util.List;
 
 public class MainWindow extends JFrame {
-    private List<Person> personList;
-    private List<Person> filterdPersonList;
-    private MyTableModel tableModel;
-    private JPanel controlPanel;
-    private JTextField searchFIO;
-    private JTable table;
+    private final List<Person> personList;
+    private final List<Person> filterdPersonList;
+    private final MyTableModel tableModel;
+    private final JTextField searchFIO;
+    private final JTable table;
     public MainWindow(List<Person> persons) throws HeadlessException {
+        setTitle("Телефонная книга");
+        ImageIcon img = new ImageIcon("phonebook.png");
+        setIconImage(img.getImage());
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.personList=new ArrayList<>(persons);
@@ -29,7 +31,7 @@ public class MainWindow extends JFrame {
         tableModel=new MyTableModel(filterdPersonList);
         table=new JTable(tableModel);
         rootPanel.add(new JScrollPane(table),BorderLayout.CENTER);
-        controlPanel = new JPanel(new BorderLayout());
+        JPanel controlPanel = new JPanel(new BorderLayout());
         JLabel promtText = new JLabel("Введите текст для поиска: ");
         searchFIO = new JTextField(30);
         addWindowListener( new WindowAdapter() {
@@ -69,11 +71,11 @@ public class MainWindow extends JFrame {
         }
         table.updateUI();
     }
-    public class MyTableModel implements TableModel {
-        private String[] columnsHeader = new String[]{"ФИО", "Должность", "Отдел", "Телефон", "IP-телефон", "e-mail", "Адрес", "Кабинет", "Имя компьютера"};
-        private Set<TableModelListener> listeners = new HashSet<TableModelListener>();
+    public static class MyTableModel implements TableModel {
+        private final String[] columnsHeader = new String[]{"ФИО", "Должность", "Отдел", "Телефон", "IP-телефон", "e-mail", "Адрес", "Кабинет", "Имя компьютера"};
+        private final Set<TableModelListener> listeners = new HashSet<>();
 
-        private List<Person> persons;
+        private final List<Person> persons;
 
         public MyTableModel(List<Person> persons) {
             this.persons = persons;

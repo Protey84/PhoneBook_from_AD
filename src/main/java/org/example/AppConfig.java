@@ -5,16 +5,15 @@ import org.example.gui.PassWordDialog;
 import org.example.utils.AppPreferences;
 import org.example.utils.PropertyReader;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.core.support.LdapContextSource;
-
-import java.io.FileReader;
-import java.io.IOException;
 import java.security.Principal;
-import java.util.Properties;
+
 
 @Configuration
+@ComponentScan("org.example.gui")
 public class AppConfig {
     @Bean
         public LdapContextSource contextSource() {
@@ -28,6 +27,7 @@ public class AppConfig {
             contextSource.setPassword(new String(passWordDialog.getPassword()));
             return contextSource;
         }
+
         @Bean
         public LdapTemplate ldapTemplate() {
             LdapTemplate ldapTemplate = new LdapTemplate(contextSource());
@@ -41,22 +41,9 @@ public class AppConfig {
         personDAO.setLdapTemplate(ldapTemplate());
         return personDAO;
         }
-
         @Bean
     public PropertyReader propertyReader(){
-        PropertyReader propertyReader=new PropertyReader();
-            Properties properties = new Properties();
-            try(FileReader fileReader = new FileReader("src/main/resources/application.properties")){
-                properties.load(fileReader);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-//получаем значения свойств из объекта Properties
-            propertyReader.setUrl(properties.getProperty("url"));
-            propertyReader.setBase(properties.getProperty("base"));
-            propertyReader.setDomain(properties.getProperty("domain"));
-            return propertyReader;
+            return new PropertyReader("src/main/resources/application.properties");
         }
 
         @Bean
@@ -65,11 +52,13 @@ public class AppConfig {
             return principal.getName();
         }
 
-    private PassWordDialog passWordDialog() {
+    @Bean
+        public PassWordDialog passWordDialog() {
         AppPreferences appPreferences=new AppPreferences();
-        PassWordDialog pwdDialog = new PassWordDialog(null, true, userDn(), appPreferences.getWord());
+        PassWordDialog pwdDialog = new PassWordDialog(null, true, userDn(), appPreferences, propertyReader());
         pwdDialog.setVisible(true);
         return pwdDialog;
     }
+
 }
 

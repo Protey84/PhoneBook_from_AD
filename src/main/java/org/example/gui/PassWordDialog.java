@@ -1,5 +1,7 @@
 package org.example.gui;
 
+import org.example.utils.AppPreferences;
+import org.example.utils.PropertyReader;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
@@ -11,13 +13,11 @@ public class PassWordDialog extends JDialog {
     private final JPasswordField jpfPassword = new JPasswordField();
 
     private final JButton jbtOk = new JButton("Login");
+    private final AppPreferences appPreferences;
 
-    public PassWordDialog() {
-        this(null, true, "", "");
-    }
-
-    public PassWordDialog(final JFrame parent, boolean modal, String username, String password) {
+    public PassWordDialog(final JFrame parent, boolean modal, String username, AppPreferences appPreferences, PropertyReader propertyReader) {
         super(parent, modal);
+        this.appPreferences=appPreferences;
         JPanel p3 = new JPanel(new GridLayout(2, 1));
         JLabel jlblUsername = new JLabel("Username");
         p3.add(jlblUsername);
@@ -25,12 +25,8 @@ public class PassWordDialog extends JDialog {
         p3.add(jlblPassword);
         JPanel p4 = new JPanel(new GridLayout(2, 1));
         jtfUsername.setText(username);
-        jpfPassword.setText(password);
-        addWindowListener( new WindowAdapter() {
-            public void windowOpened( WindowEvent e ){
-                jbtOk.requestFocus();
-            }
-        });
+        jpfPassword.setText(appPreferences.getWord(username));
+
         p4.add(jtfUsername);
         p4.add(jpfPassword);
 
@@ -44,6 +40,7 @@ public class PassWordDialog extends JDialog {
         JPanel p5 = new JPanel(new BorderLayout());
         p5.add(p2, BorderLayout.CENTER);
         JCheckBox cbStored = new JCheckBox("Запомнить пароль");
+        cbStored.setSelected(propertyReader.isSavePass());
         p5.add(cbStored, BorderLayout.NORTH);
         cbStored.setHorizontalAlignment(SwingConstants.CENTER);
 
@@ -59,22 +56,30 @@ public class PassWordDialog extends JDialog {
             public void windowClosing(WindowEvent e) {
                 System.exit(0);
             }
+            @Override
+            public void windowOpened( WindowEvent e ){
+                jbtOk.requestFocus();
+            }
         });
-
 
         jbtOk.addActionListener(e -> {
+            if (cbStored.isSelected())
+                savePass();
+            else
+                appPreferences.removeWord();
+            propertyReader.setSavePass(cbStored.isSelected());
             setVisible(false);
-            /*if ("stackoverflow".equals(String.valueOf(jpfPassword.getPassword()))
-                    && "stackoverflow".equals(jtfUsername.getText())) {
-                parent.setVisible(true);
-                setVisible(false);
-            } else {
-                jlblStatus.setText("Invalid username or password");
-            }*/
         });
+        JRootPane rootPane = SwingUtilities.getRootPane(jbtOk);
+        rootPane.setDefaultButton(jbtOk);
     }
     public String getLogin(){
         return jtfUsername.getText();
+    }
+
+    private void savePass(){
+        String login=jtfUsername.getText();
+        appPreferences.saveWord(new String(jpfPassword.getPassword()), login);
     }
     public char[] getPassword() {
         char[] pwd = jpfPassword.getPassword().clone();

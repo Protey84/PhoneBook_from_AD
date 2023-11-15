@@ -1,7 +1,6 @@
 package org.example.utils;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
+import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.security.spec.KeySpec;
 import java.util.Base64;
@@ -14,8 +13,6 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
 public class CryptographyUtil {
-    @Autowired
-    AppPreferences appPreferences;
     private static final int KEY_LENGTH = 256;
     private static final int ITERATION_COUNT = 65536;
     public static String encrypt(String strToEncrypt, String secretKey, String salt) {
@@ -35,7 +32,7 @@ public class CryptographyUtil {
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
             cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivspec);
 
-            byte[] cipherText = cipher.doFinal(strToEncrypt.getBytes("UTF-8"));
+            byte[] cipherText = cipher.doFinal(strToEncrypt.getBytes(StandardCharsets.UTF_8));
             byte[] encryptedData = new byte[iv.length + cipherText.length];
             System.arraycopy(iv, 0, encryptedData, 0, iv.length);
             System.arraycopy(cipherText, 0, encryptedData, iv.length, cipherText.length);
@@ -68,7 +65,7 @@ public class CryptographyUtil {
             System.arraycopy(encryptedData, 16, cipherText, 0, cipherText.length);
 
             byte[] decryptedText = cipher.doFinal(cipherText);
-            return new String(decryptedText, "UTF-8");
+            return new String(decryptedText, StandardCharsets.UTF_8);
         } catch (Exception e) {
             // Handle the exception properly
             e.printStackTrace();
@@ -78,7 +75,7 @@ public class CryptographyUtil {
 
 
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
 
 // Define your secret key and salt (keep these secure and don't hardcode in production)
         String secretKey = "MySecretKey";
