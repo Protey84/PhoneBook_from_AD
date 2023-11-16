@@ -30,6 +30,7 @@ public class MainWindow extends JFrame {
         JPanel rootPanel = new JPanel(new BorderLayout());
         tableModel=new MyTableModel(filterdPersonList);
         table=new JTable(tableModel);
+        table.setAutoCreateRowSorter(true);
         rootPanel.add(new JScrollPane(table),BorderLayout.CENTER);
         JPanel controlPanel = new JPanel(new BorderLayout());
         JLabel promtText = new JLabel("Введите текст для поиска: ");
@@ -72,7 +73,7 @@ public class MainWindow extends JFrame {
         table.updateUI();
     }
     public static class MyTableModel implements TableModel {
-        private final String[] columnsHeader = new String[]{"ФИО", "Должность", "Отдел", "Телефон", "IP-телефон", "e-mail", "Адрес", "Кабинет", "Имя компьютера"};
+        private final String[] columnsHeader = new String[]{"Отдел", "ФИО", "Должность", "Телефон", "IP-телефон", "e-mail", "Адрес", "Кабинет", "Имя компьютера"};
         private final Set<TableModelListener> listeners = new HashSet<>();
 
         private final List<Person> persons;
