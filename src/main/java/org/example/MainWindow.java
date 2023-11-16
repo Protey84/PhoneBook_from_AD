@@ -6,6 +6,7 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.TableModelListener;
+import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
@@ -16,21 +17,21 @@ import java.util.List;
 public class MainWindow extends JFrame {
     private final List<Person> personList;
     private final List<Person> filterdPersonList;
-    private final MyTableModel tableModel;
     private final JTextField searchFIO;
     private final JTable table;
     public MainWindow(List<Person> persons) throws HeadlessException {
         setTitle("Телефонная книга");
-        ImageIcon img = new ImageIcon("phonebook.png");
+        ImageIcon img = new ImageIcon("src/main/resources/phonebook.png");
         setIconImage(img.getImage());
-        setSize(800, 600);
+        setSize(900, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.personList=new ArrayList<>(persons);
         this.filterdPersonList=new ArrayList<>(persons);
         JPanel rootPanel = new JPanel(new BorderLayout());
-        tableModel=new MyTableModel(filterdPersonList);
+        MyTableModel tableModel = new MyTableModel(filterdPersonList);
         table=new JTable(tableModel);
         table.setAutoCreateRowSorter(true);
+        setColumnWidth();
         rootPanel.add(new JScrollPane(table),BorderLayout.CENTER);
         JPanel controlPanel = new JPanel(new BorderLayout());
         JLabel promtText = new JLabel("Введите текст для поиска: ");
@@ -63,6 +64,23 @@ public class MainWindow extends JFrame {
         setVisible(true);
     }
 
+    private void setColumnWidth(){
+        TableColumnModel columnModel = table.getColumnModel();
+        columnModel.getColumn(0).setPreferredWidth(15);
+        columnModel.getColumn(1).setPreferredWidth(150);
+        columnModel.getColumn(1).setMinWidth(150);
+        columnModel.getColumn(2).setPreferredWidth(80);
+        columnModel.getColumn(2).setMinWidth(80);
+        columnModel.getColumn(3).setPreferredWidth(50);
+        columnModel.getColumn(3).setMaxWidth(50);
+        columnModel.getColumn(4).setPreferredWidth(15);
+        columnModel.getColumn(5).setPreferredWidth(15);
+        columnModel.getColumn(6).setPreferredWidth(15);
+        columnModel.getColumn(7).setPreferredWidth(40);
+        columnModel.getColumn(7).setMaxWidth(40);
+        columnModel.getColumn(8).setPreferredWidth(15);
+    }
+
     public void searchText(){
         this.filterdPersonList.clear();
         for (Person p:this.personList) {
@@ -73,7 +91,7 @@ public class MainWindow extends JFrame {
         table.updateUI();
     }
     public static class MyTableModel implements TableModel {
-        private final String[] columnsHeader = new String[]{"Отдел", "ФИО", "Должность", "Телефон", "IP-телефон", "e-mail", "Адрес", "Кабинет", "Имя компьютера"};
+        private final String[] columnsHeader = new String[]{"Отдел", "ФИО", "Телефон", "IP-телефон", "Должность", "e-mail", "Адрес", "Кабинет", "Имя компьютера"};
         private final Set<TableModelListener> listeners = new HashSet<>();
 
         private final List<Person> persons;

@@ -3,15 +3,14 @@ package org.example.dao;
 import org.example.domain.Person;
 import org.example.utils.PersonAttributesMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.ldap.core.ContextSource;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.filter.AndFilter;
 import org.springframework.ldap.filter.EqualsFilter;
-import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by Tugrul on 11.02.2014.
@@ -25,7 +24,6 @@ public class PersonDAOImpl implements PersonDAO{
         this.ldapTemplate = ldapTemplate;
     }
 
-    protected final static String baseDN = "OU=TOGS";
 
     @Override
     public List<Person> getAllPersons() {
@@ -36,7 +34,8 @@ public class PersonDAOImpl implements PersonDAO{
         } catch (Exception e) {
             System.out.println("Error: " + e);
         }
-        return persons;
+        Comparator<Person> comparator=Comparator.comparing(Person::getDepartment).thenComparing(Person::getName);
+        return persons.stream().filter(person -> (person.getName().length()-person.getName().replace(" ", "").length() ==2)).sorted(comparator).collect(Collectors.toList());
     }
 
     @Override
