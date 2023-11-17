@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface PersonDAO {
 
-    public List<Person> getAllPersons();
+    public List<Person> getAllPersons(List foundObjects);
 
     public List findUserByCommonName(String commonName);
 

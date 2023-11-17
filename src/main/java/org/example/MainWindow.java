@@ -31,6 +31,8 @@ public class MainWindow extends JFrame {
         MyTableModel tableModel = new MyTableModel(filterdPersonList);
         table=new JTable(tableModel);
         table.setAutoCreateRowSorter(true);
+        table.setFont(new Font("Arial", Font.PLAIN, 14));
+        table.setRowHeight(20);
         setColumnWidth();
         rootPanel.add(new JScrollPane(table),BorderLayout.CENTER);
         JPanel controlPanel = new JPanel(new BorderLayout());
@@ -67,10 +69,10 @@ public class MainWindow extends JFrame {
     private void setColumnWidth(){
         TableColumnModel columnModel = table.getColumnModel();
         columnModel.getColumn(0).setPreferredWidth(15);
-        columnModel.getColumn(1).setPreferredWidth(150);
-        columnModel.getColumn(1).setMinWidth(150);
-        columnModel.getColumn(2).setPreferredWidth(80);
-        columnModel.getColumn(2).setMinWidth(80);
+        columnModel.getColumn(1).setPreferredWidth(170);
+        columnModel.getColumn(1).setMinWidth(170);
+        columnModel.getColumn(2).setPreferredWidth(90);
+        columnModel.getColumn(2).setMinWidth(90);
         columnModel.getColumn(3).setPreferredWidth(50);
         columnModel.getColumn(3).setMaxWidth(50);
         columnModel.getColumn(4).setPreferredWidth(15);

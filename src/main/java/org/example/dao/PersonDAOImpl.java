@@ -26,10 +26,10 @@ public class PersonDAOImpl implements PersonDAO{
 
 
     @Override
-    public List<Person> getAllPersons() {
+    public List<Person> getAllPersons(List search) {
         List<Person> persons = new ArrayList<Person>();
         try {
-            List search = ldapTemplate.search("", "(&(sn=*)(objectCategory=Person)((UserAccountControl:1.2.840.113556.1.4.803:=512))(givenName=*)(company=Вологдастат))", new PersonAttributesMapper());
+            //List search = ldapTemplate.search("", "(&(sn=*)(objectCategory=Person)((UserAccountControl:1.2.840.113556.1.4.803:=512))(givenName=*)(company=Вологдастат))", new PersonAttributesMapper());
             persons.addAll(search);
         } catch (Exception e) {
             System.out.println("Error: " + e);
@@ -50,7 +50,8 @@ public class PersonDAOImpl implements PersonDAO{
     public List findUserByDepartment(String department) {
         AndFilter andFilter = new AndFilter();
         andFilter.and(new EqualsFilter("company", department));
-        andFilter.and(new EqualsFilter("UserAccountControl:1.2.840.113556.1.4.803:", 0));
+        andFilter.and(new EqualsFilter("objectCategory", "Person"));
+        andFilter.and(new EqualsFilter("UserAccountControl:1.2.840.113556.1.4.803:", 512));
         return ldapTemplate.search("", andFilter.encode(), new PersonAttributesMapper());
     }
 }

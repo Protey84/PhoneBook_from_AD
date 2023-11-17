@@ -9,7 +9,7 @@ public class PropertyReader {
     private String url;
     private String base;
     private String domain;
-
+    private String company;
     private boolean savePass;
     private final String file;
     private final Properties properties;
@@ -28,6 +28,9 @@ public class PropertyReader {
         }
     }
 
+    public String getCompany() {
+        return company;
+    }
 
     public String getDomain() {
         return domain;
