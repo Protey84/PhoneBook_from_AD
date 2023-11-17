@@ -1,7 +1,8 @@
 package org.example.domain;
 
-public class Person {
+import java.util.HashSet;
 
+public class Person {
     private String name;
     private String telephoneNumber;
     private String ipPhone;
@@ -81,35 +82,9 @@ public class Person {
 
     public boolean contains(String search){
         String summ=String.join(" ", this.name, this.mail, this.department, this.telephoneNumber, this.streetAddress, this.description).toLowerCase();
-        return search==null||search.isEmpty()||summ.contains(search.toLowerCase())||summ.contains(convert(search.toLowerCase()));
+        return search==null||search.isEmpty()||summ.contains(search.toLowerCase())||summ.contains(Switcher.switchToDifferentLayout(search));
     }
 
-    public String convert(String message) {
-        boolean result = message.matches(".*\\p{InCyrillic}.*");
-        char[] ru = {'й','ц','у','к','е','н','г','ш','щ','з','х','ъ','ф','ы','в','а','п','р','о','л','д','ж','э', 'я','ч', 'с','м','и','т','ь','б', 'ю','.'};
-        char[] en = {'q','w','e','r','t','y','u','i','o','p','[',']','a','s','d','f','g','h','j','k','l',';','"','z','x','c','v','b','n','m',',','.','/'};
-        StringBuilder builder = new StringBuilder();
-
-        if (result) {
-            for (int i = 0; i < message.length(); i++) {
-                for (int j = 0; j < ru.length; j++ ) {
-                    if (message.charAt(i) == ru[j]) {
-                        builder.append(en[j]);
-                    }
-                }
-            }
-        } else {
-            for (int i = 0; i < message.length(); i++) {
-                for (int j = 0; j < en.length; j++ ) {
-                    if (message.charAt(i) == en[j]) {
-                        builder.append(ru[j]);
-                    }
-                }
-            }
-        }
-
-        return builder.toString();
-    }
 
     @Override
     public String toString() {
@@ -124,5 +99,42 @@ public class Person {
                 ", description='" + description + '\'' +
                 ", department='" + department + '\'' +
                 '}';
+    }
+}
+
+class Switcher{
+    static char[] ru = "ёйцукенгшщзхъфывапролджэячсмитьбю".toCharArray();
+    static char[] en = "`qwertyuiop[]asdfghjkl;'zxcvbnm,.".toCharArray();
+    static HashSet<Character> ruSet=new HashSet<>();
+    static HashSet<Character> enSet=new HashSet<>();
+    static {
+        for (Character ch:ru) {
+            ruSet.add(ch);
+        }
+        for (Character ch:en) {
+            enSet.add(ch);
+        }
+    }
+    static String switchToDifferentLayout(String message) {
+        char[] symbolsMessage=message.toLowerCase().toCharArray();
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < message.length(); i++) {
+            if (ruSet.contains(symbolsMessage[i])){
+                builder.append(switchChar(symbolsMessage[i], ru, en));
+            } else if (enSet.contains(symbolsMessage[i])) {
+                builder.append(switchChar(symbolsMessage[i], en, ru));
+            }
+            else
+                builder.append(symbolsMessage[i]);
+        }
+        return builder.toString();
+    }
+    static char switchChar(char ch, char[] from, char[] to){
+        for (int i = 0; i < from.length; i++) {
+            if (ch==from[i]){
+                return to[i];
+            }
+        }
+        return ch;
     }
 }
