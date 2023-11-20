@@ -1,6 +1,7 @@
 package org.example;
 
 import org.example.domain.Person;
+import org.example.utils.FileVerifayer;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -21,7 +22,7 @@ public class MainWindow extends JFrame {
     private final JTable table;
     public MainWindow(List<Person> persons) throws HeadlessException {
         setTitle("Телефонная книга");
-        ImageIcon img = new ImageIcon("src/main/resources/phonebook.png");
+        ImageIcon img = new ImageIcon(new FileVerifayer("src/main/resources","phonebook.png").getFile().getAbsolutePath());
         setIconImage(img.getImage());
         setSize(900, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -86,6 +87,7 @@ public class MainWindow extends JFrame {
     public void searchText(){
         this.filterdPersonList.clear();
         for (Person p:this.personList) {
+            System.out.println(p.getName());
             if (p.contains(searchFIO.getText())){
                 this.filterdPersonList.add(p);
             }

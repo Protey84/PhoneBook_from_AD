@@ -11,13 +11,13 @@ public class PropertyReader {
     private String domain;
     private String company;
     private boolean savePass;
-    private final String file;
+    private final File file;
     private final Properties properties;
 
-    public PropertyReader(String file) {
+    public PropertyReader(File file) {
         this.file = file;
         properties = new Properties();
-        try(FileReader fileReader = new FileReader("src/main/resources/application.properties")){
+        try(FileReader fileReader = new FileReader(file)){
             properties.load(fileReader);
             this.url=properties.getProperty("url");
             this.base=properties.getProperty("base");
@@ -50,7 +50,7 @@ public class PropertyReader {
     }
 
     public void setSavePass(boolean savePass) {
-        try (OutputStream out= Files.newOutputStream(Paths.get(file))){
+        try (OutputStream out= new FileOutputStream(file)){
             properties.setProperty("savePass", Boolean.toString(savePass));
             properties.store(out, "");
         }

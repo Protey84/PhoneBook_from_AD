@@ -12,9 +12,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Created by Tugrul on 11.02.2014.
- */
+
 public class PersonDAOImpl implements PersonDAO{
     @Autowired
     private LdapTemplate ldapTemplate;

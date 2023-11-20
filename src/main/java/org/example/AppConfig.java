@@ -3,6 +3,7 @@ package org.example;
 import org.example.dao.PersonDAOImpl;
 import org.example.gui.PassWordDialog;
 import org.example.utils.AppPreferences;
+import org.example.utils.FileVerifayer;
 import org.example.utils.PropertyReader;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -43,7 +44,7 @@ public class AppConfig {
         }
         @Bean
     public PropertyReader propertyReader(){
-            return new PropertyReader("src/main/resources/application.properties");
+            return new PropertyReader(new FileVerifayer("src/main/resources", "application.properties").getFile());
         }
 
         @Bean
