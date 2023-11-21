@@ -2,7 +2,6 @@ package org.example.dao;
 
 import org.example.domain.Person;
 import org.example.utils.PersonAttributesMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.filter.AndFilter;
 import org.springframework.ldap.filter.EqualsFilter;
@@ -14,7 +13,6 @@ import java.util.stream.Collectors;
 
 
 public class PersonDAOImpl implements PersonDAO{
-    @Autowired
     private LdapTemplate ldapTemplate;
 
 
@@ -25,12 +23,11 @@ public class PersonDAOImpl implements PersonDAO{
 
     @Override
     public List<Person> getAllPersons(List search) {
-        List<Person> persons = new ArrayList<Person>();
+        List<Person> persons = new ArrayList<>();
         try {
-            //List search = ldapTemplate.search("", "(&(sn=*)(objectCategory=Person)((UserAccountControl:1.2.840.113556.1.4.803:=512))(givenName=*)(company=Вологдастат))", new PersonAttributesMapper());
             persons.addAll(search);
         } catch (Exception e) {
-            System.out.println("Error: " + e);
+            e.printStackTrace();
         }
         Comparator<Person> comparator=Comparator.comparing(Person::getDepartment).thenComparing(Person::getName);
         return persons.stream().filter(person -> (person.getName().length()-person.getName().replace(" ", "").length() ==2)).sorted(comparator).collect(Collectors.toList());

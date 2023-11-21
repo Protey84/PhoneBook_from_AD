@@ -2,6 +2,7 @@ package org.example;
 
 import org.example.domain.Person;
 import org.example.utils.FileVerifayer;
+import org.example.utils.Switcher;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -9,15 +10,15 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 import java.awt.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.*;
 import java.util.*;
 import java.util.List;
 
 public class MainWindow extends JFrame {
-    private final List<Person> personList;
-    private final List<Person> filterdPersonList;
     private final JTextField searchFIO;
     private final JTable table;
     public MainWindow(List<Person> persons) throws HeadlessException {
@@ -26,38 +27,64 @@ public class MainWindow extends JFrame {
         setIconImage(img.getImage());
         setSize(900, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.personList=new ArrayList<>(persons);
-        this.filterdPersonList=new ArrayList<>(persons);
+        List<Person> filterdPersonList = new ArrayList<>(persons);
         JPanel rootPanel = new JPanel(new BorderLayout());
         MyTableModel tableModel = new MyTableModel(filterdPersonList);
+        final TableRowSorter<TableModel> sorter1 = new TableRowSorter<>(tableModel);
+
         table=new JTable(tableModel);
         table.setAutoCreateRowSorter(true);
         table.setFont(new Font("Arial", Font.PLAIN, 14));
         table.setRowHeight(20);
+        table.setRowSorter(sorter1);
         setColumnWidth();
+        final JPopupMenu popupMenu = new JPopupMenu();
+        JMenuItem copyMailItem = new JMenuItem("Копировать e-mail");
+        copyMailItem.addActionListener(e -> copyToClipboard(5));
+        JMenuItem copyFio = new JMenuItem("Копировать ФИО");
+        copyFio.addActionListener(e -> copyToClipboard(1));
+        popupMenu.add(copyFio);
+        popupMenu.add(copyMailItem);
+        table.setComponentPopupMenu(popupMenu);
         rootPanel.add(new JScrollPane(table),BorderLayout.CENTER);
         JPanel controlPanel = new JPanel(new BorderLayout());
         JLabel promtText = new JLabel("Введите текст для поиска: ");
         searchFIO = new JTextField(30);
+        searchFIO.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                String excl=".^$*+?()[{\\|";
+                if (excl.indexOf(e.getKeyChar())>=0){
+                    e.consume();
+                }
+            }
+        });
         addWindowListener( new WindowAdapter() {
+            @Override
             public void windowOpened( WindowEvent e ){
                 searchFIO.requestFocus();
             }
         });
-        searchFIO.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                searchText();
+        searchFIO.getDocument().addDocumentListener(new DocumentListener(){
+            @Override public void insertUpdate(DocumentEvent e) {
+                search(searchFIO.getText());
             }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                searchText();
+            @Override public void removeUpdate(DocumentEvent e) {
+                search(searchFIO.getText());
             }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                searchText();
+            @Override public void changedUpdate(DocumentEvent e) {
+                search(searchFIO.getText());
+            }
+            public void search(String s)
+            {
+                if (s.length() == 0) {
+                    sorter1.setRowFilter(null);
+                } else {
+                    List<RowFilter<Object,Object>> filters = new ArrayList<>(2);
+                    filters.add(RowFilter.regexFilter(s));
+                    filters.add(RowFilter.regexFilter(Switcher.switchToDifferentLayout(s)));
+                    sorter1.setRowFilter(RowFilter.orFilter(filters));
+                }
             }
         });
         controlPanel.add(promtText, BorderLayout.WEST);
@@ -65,6 +92,12 @@ public class MainWindow extends JFrame {
         rootPanel.add(controlPanel, BorderLayout.PAGE_END);
         setContentPane(rootPanel);
         setVisible(true);
+    }
+
+    private void copyToClipboard(int column){
+        StringSelection selection = new StringSelection(this.table.getValueAt(table.getSelectedRow(), column).toString());
+        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+        clipboard.setContents(selection, selection);
     }
 
     private void setColumnWidth(){
@@ -84,16 +117,6 @@ public class MainWindow extends JFrame {
         columnModel.getColumn(8).setPreferredWidth(15);
     }
 
-    public void searchText(){
-        this.filterdPersonList.clear();
-        for (Person p:this.personList) {
-            System.out.println(p.getName());
-            if (p.contains(searchFIO.getText())){
-                this.filterdPersonList.add(p);
-            }
-        }
-        table.updateUI();
-    }
     public static class MyTableModel implements TableModel {
         private final String[] columnsHeader = new String[]{"Отдел", "ФИО", "Телефон", "IP-телефон", "Должность", "e-mail", "Адрес", "Кабинет", "Имя компьютера"};
         private final Set<TableModelListener> listeners = new HashSet<>();
@@ -147,8 +170,9 @@ public class MainWindow extends JFrame {
                     return person.getIpPhone();
                 case "Кабинет":
                     return person.getOffice();
+                default:
+                    return "";
             }
-            return "";
         }
 
         public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -160,7 +184,7 @@ public class MainWindow extends JFrame {
         }
 
         public void setValueAt(Object value, int rowIndex, int columnIndex) {
-
+        // Noncompliant - method is empty
         }
 
     }

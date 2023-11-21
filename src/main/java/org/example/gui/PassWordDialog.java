@@ -13,7 +13,7 @@ public class PassWordDialog extends JDialog {
     private final JPasswordField jpfPassword = new JPasswordField();
 
     private final JButton jbtOk = new JButton("Login");
-    private final AppPreferences appPreferences;
+    private final transient AppPreferences appPreferences;
 
     public PassWordDialog(final JFrame parent, boolean modal, String username, AppPreferences appPreferences, PropertyReader propertyReader) {
         super(parent, modal);

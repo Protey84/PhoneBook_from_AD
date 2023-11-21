@@ -4,17 +4,20 @@ import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.security.spec.KeySpec;
 import java.util.Base64;
-
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
 public class CryptographyUtil {
     private static final int KEY_LENGTH = 256;
     private static final int ITERATION_COUNT = 65536;
+
+    private CryptographyUtil() {
+    }
+
     public static String encrypt(String strToEncrypt, String secretKey, String salt) {
 
         try {
@@ -22,15 +25,14 @@ public class CryptographyUtil {
             SecureRandom secureRandom = new SecureRandom();
             byte[] iv = new byte[16];
             secureRandom.nextBytes(iv);
-            IvParameterSpec ivspec = new IvParameterSpec(iv);
 
             SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
             KeySpec spec = new PBEKeySpec(secretKey.toCharArray(), salt.getBytes(), ITERATION_COUNT, KEY_LENGTH);
             SecretKey tmp = factory.generateSecret(spec);
             SecretKeySpec secretKeySpec = new SecretKeySpec(tmp.getEncoded(), "AES");
-
-            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-            cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivspec);
+            Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+            GCMParameterSpec gcmParameterSpec = new GCMParameterSpec(16 * 8, new byte[16]);
+            cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, gcmParameterSpec);
 
             byte[] cipherText = cipher.doFinal(strToEncrypt.getBytes(StandardCharsets.UTF_8));
             byte[] encryptedData = new byte[iv.length + cipherText.length];
@@ -51,15 +53,15 @@ public class CryptographyUtil {
             byte[] encryptedData = Base64.getDecoder().decode(strToDecrypt);
             byte[] iv = new byte[16];
             System.arraycopy(encryptedData, 0, iv, 0, iv.length);
-            IvParameterSpec ivspec = new IvParameterSpec(iv);
 
             SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
             KeySpec spec = new PBEKeySpec(secretKey.toCharArray(), salt.getBytes(), ITERATION_COUNT, KEY_LENGTH);
             SecretKey tmp = factory.generateSecret(spec);
             SecretKeySpec secretKeySpec = new SecretKeySpec(tmp.getEncoded(), "AES");
 
-            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-            cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivspec);
+            Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+            GCMParameterSpec gcmParameterSpec = new GCMParameterSpec(16 * 8, new byte[16]);
+            cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, gcmParameterSpec);
 
             byte[] cipherText = new byte[encryptedData.length - 16];
             System.arraycopy(encryptedData, 16, cipherText, 0, cipherText.length);
@@ -71,36 +73,6 @@ public class CryptographyUtil {
             e.printStackTrace();
             return null;
         }
-    }
-
-
-
-    public static void main(String[] args) {
-
-// Define your secret key and salt (keep these secure and don't hardcode in production)
-        String secretKey = "MySecretKey";
-        String salt = "MySalt";
-
-        // String to be encrypted
-        String originalString = "Hello, this is a secret message.";
-
-        // Encrypt the string
-        String encryptedString = CryptographyUtil.encrypt(originalString, secretKey, salt);
-        if (encryptedString != null) {
-            System.out.println("Encrypted: " + encryptedString);
-        } else {
-            System.err.println("Encryption failed.");
-            return;
-        }
-
-        // Decrypt the string
-        String decryptedString = CryptographyUtil.decrypt(encryptedString, secretKey, salt);
-        if (decryptedString != null) {
-            System.out.println("Decrypted: " + decryptedString);
-        } else {
-            System.err.println("Decryption failed.");
-        }
-
     }
 
 }
