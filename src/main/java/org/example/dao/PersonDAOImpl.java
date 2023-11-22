@@ -22,7 +22,7 @@ public class PersonDAOImpl implements PersonDAO{
 
 
     @Override
-    public List<Person> getAllPersons(List search) {
+    public List<Person> getAllPersons(List<Person> search) {
         List<Person> persons = new ArrayList<>();
         try {
             persons.addAll(search);
@@ -34,19 +34,21 @@ public class PersonDAOImpl implements PersonDAO{
     }
 
     @Override
-    public List findUserByCommonName(String commonName) {
-        AndFilter andFilter = new AndFilter();
-        andFilter.and(new EqualsFilter("objectclass","person"));
-        andFilter.and(new EqualsFilter("cn", commonName));
-        return ldapTemplate.search("", andFilter.encode(), new PersonAttributesMapper());
-    }
-
-    @Override
-    public List findUserByDepartment(String department) {
+    public List<Person> findUserByDepartment(String department) {
         AndFilter andFilter = new AndFilter();
         andFilter.and(new EqualsFilter("company", department));
         andFilter.and(new EqualsFilter("objectCategory", "Person"));
         andFilter.and(new EqualsFilter("UserAccountControl:1.2.840.113556.1.4.803:", 512));
-        return ldapTemplate.search("", andFilter.encode(), new PersonAttributesMapper());
+        return searchPersonByFilter(andFilter);
+    }
+
+    private List<Person> searchPersonByFilter(AndFilter filter){
+        List<Person> personList=new ArrayList<>();
+        try {
+            personList=ldapTemplate.search("", filter.encode(), new PersonAttributesMapper());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return personList;
     }
 }

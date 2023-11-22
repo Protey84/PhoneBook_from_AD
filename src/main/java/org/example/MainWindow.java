@@ -1,7 +1,7 @@
 package org.example;
 
 import org.example.domain.Person;
-import org.example.utils.FileVerifayer;
+import org.example.utils.FileInspector;
 import org.example.utils.Switcher;
 
 import javax.swing.*;
@@ -23,7 +23,7 @@ public class MainWindow extends JFrame {
     private final JTable table;
     public MainWindow(List<Person> persons) throws HeadlessException {
         setTitle("Телефонная книга");
-        ImageIcon img = new ImageIcon(new FileVerifayer("src/main/resources","phonebook.png").getFile().getAbsolutePath());
+        ImageIcon img = new ImageIcon(new FileInspector("src/main/resources","phonebook.png").getFile().getAbsolutePath());
         setIconImage(img.getImage());
         setSize(900, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
