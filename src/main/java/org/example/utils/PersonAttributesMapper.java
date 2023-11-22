@@ -7,10 +7,10 @@ import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
 
-public class PersonAttributesMapper implements AttributesMapper{
+public class PersonAttributesMapper implements AttributesMapper<Person>{
 
     @Override
-    public Object mapFromAttributes(Attributes attributes) throws NamingException {
+    public Person mapFromAttributes(Attributes attributes) throws NamingException {
         Person person = new Person();
 
         Attribute name = attributes.get("name");
@@ -57,8 +57,6 @@ public class PersonAttributesMapper implements AttributesMapper{
         if (description != null){
             person.setDescription(((String) description.get()));
         }
-
-        //System.out.println(person.toString());
 
         return person;
     }
