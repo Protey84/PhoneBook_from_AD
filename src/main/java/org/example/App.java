@@ -2,6 +2,7 @@ package org.example;
 
 import org.example.dao.PersonDAO;
 import org.example.domain.Person;
+import org.example.utils.PropertyReader;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -13,10 +14,8 @@ public class App
     {
         ApplicationContext ctx=new AnnotationConfigApplicationContext(AppConfig.class);
         PersonDAO personDAO = (PersonDAO) ctx.getBean("personDAO");
-        List<Person> getAllPersons = personDAO.getAllPersons(personDAO.findUserByDepartment("Вологдастат"));
+        PropertyReader propertyReader = (PropertyReader) ctx.getBean("propertyReader");
+        List<Person> getAllPersons = personDAO.getAllPersons(personDAO.findUserByDepartment(propertyReader.getCompany()));
         new MainWindow(getAllPersons);
-        System.out.println("All user size: " + getAllPersons.size());
-        //System.out.println("Found user size: " + findUserByCommonName.size());
-
     }
 }

@@ -6,6 +6,7 @@ import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.filter.AndFilter;
 import org.springframework.ldap.filter.EqualsFilter;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -47,7 +48,8 @@ public class PersonDAOImpl implements PersonDAO{
         try {
             personList=ldapTemplate.search("", filter.encode(), new PersonAttributesMapper());
         }catch (Exception e){
-            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Ошибка авторизации. Проверьте пароль!");
+            System.exit(0);
         }
         return personList;
     }

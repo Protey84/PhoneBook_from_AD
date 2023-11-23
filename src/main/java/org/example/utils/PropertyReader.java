@@ -1,8 +1,8 @@
 package org.example.utils;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Properties;
 
 public class PropertyReader {
@@ -22,6 +22,7 @@ public class PropertyReader {
             this.url=properties.getProperty("url");
             this.base=properties.getProperty("base");
             this.domain=properties.getProperty("domain");
+            this.company=new String(properties.getProperty("company").getBytes(StandardCharsets.UTF_8));
             this.savePass=Boolean.parseBoolean(properties.getProperty("savePass"));
         } catch (IOException e) {
             e.printStackTrace();
@@ -50,7 +51,7 @@ public class PropertyReader {
     }
 
     public void setSavePass(boolean savePass) {
-        try (OutputStream out= new FileOutputStream(file)){
+        try (OutputStream out= Files.newOutputStream(file.toPath())){
             properties.setProperty("savePass", Boolean.toString(savePass));
             properties.store(out, "");
         }
