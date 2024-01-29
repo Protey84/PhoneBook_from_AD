@@ -12,6 +12,7 @@ public class AppPreferences {
     }
 
     public void saveWord(String word, String login) {
+        preferences.remove("word");
         preferences.put("word", CryptographyUtil.encrypt(word, secretKey, login));
     }
 

@@ -50,15 +50,7 @@ public class MainWindow extends JFrame {
         JPanel controlPanel = new JPanel(new BorderLayout());
         JLabel promtText = new JLabel("Введите текст для поиска: ");
         searchFIO = new JTextField(30);
-        searchFIO.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyTyped(KeyEvent e) {
-                String excl=".^$*+?()[{\\|";
-                if (excl.indexOf(e.getKeyChar())>=0){
-                    e.consume();
-                }
-            }
-        });
+
         addWindowListener( new WindowAdapter() {
             @Override
             public void windowOpened( WindowEvent e ){
@@ -82,7 +74,7 @@ public class MainWindow extends JFrame {
                 } else {
                     List<RowFilter<Object,Object>> filters = new ArrayList<>(2);
                     filters.add(RowFilter.regexFilter(s));
-                    filters.add(RowFilter.regexFilter(Switcher.switchToDifferentLayout(s)));
+                    filters.add(RowFilter.regexFilter( "\\Q"+Switcher.switchToDifferentLayout(s)+"\\E"));
                     sorter1.setRowFilter(RowFilter.orFilter(filters));
                 }
             }
