@@ -13,9 +13,14 @@ public class App
     public static void main( String[] args )
     {
         ApplicationContext ctx=new AnnotationConfigApplicationContext(AppConfig.class);
+        List<Person> allPersons = getPersons(ctx);
+        new MainWindow(allPersons);
+    }
+
+    public static List<Person> getPersons(ApplicationContext ctx){
         PersonDAO personDAO = (PersonDAO) ctx.getBean("personDAO");
         PropertyReader propertyReader = (PropertyReader) ctx.getBean("propertyReader");
-        List<Person> getAllPersons = personDAO.getAllPersons(personDAO.findUserByDepartment(propertyReader.getCompany()));
-        new MainWindow(getAllPersons);
+        return personDAO.getAllPersons(personDAO.findUserByDepartment(propertyReader.getCompany()));
     }
+
 }

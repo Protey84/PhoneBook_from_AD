@@ -4,11 +4,11 @@ import java.util.Arrays;
 import java.util.HashSet;
 
 public class Switcher{
-    static String ruLetters="ёйцукенгшщзхъфывапролджэячсмитьбю";
-    static String enLetters="`qwertyuiop[]asdfghjkl;'zxcvbnm,.";
+    static String ruLetters="ёйцукенгшщзхъфывапролджэячсмитьбюЁЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ";
+    static String enLetters="`qwertyuiop[]asdfghjkl;'zxcvbnm,.~QWERTYUIOP{}ASDFGHJKL:\"ZXCVBNM<>";
 
-    static String[] ru = (ruLetters+ruLetters.toUpperCase()).split("");
-    static String[] en = (enLetters+enLetters.toUpperCase()).split("");
+    static String[] ru = (ruLetters).split("");
+    static String[] en = (enLetters).split("");
     static HashSet<String> ruSet=new HashSet<>();
     static HashSet<String> enSet=new HashSet<>();
     static {
@@ -27,7 +27,7 @@ public class Switcher{
         for (int i = 0; i < message.length(); i++) {
             if (ruSet.contains(symbolsMessage[i])){
                 builder.append(switchChar(symbolsMessage[i], ru, en));
-            } else if (enSet.contains(symbolsMessage[i])&&Character.isLetter(symbolsMessage[i].charAt(0))) {
+            } else if (enSet.contains(symbolsMessage[i])) {
                 builder.append(switchChar(symbolsMessage[i], en, ru));
             }
             else
